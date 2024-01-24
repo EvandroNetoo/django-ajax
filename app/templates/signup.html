@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block head %}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4"></div>
+
+        <div class="col-lg-4">
+            <h2 class="text-center">Register</h2>
+            <hr>
+            {% include 'partials/message.html' %}
+            <div id="meessageDiv"></div>
+            <form action="">
+                {% csrf_token %}
+                <label for="email">Username *</label>
+                <input class="form-control" type="text" id="ipt_username">
+                <br>
+                <label for="email">Password *</label>
+                <input class="form-control" type="password" id="ipt_password1">
+                <br>
+                <label for="email">Confirm password *</label>
+                <input class="form-control" type="password" id="ipt_password2">
+            </form>
+            <br>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-success" id="btnSignUp">Sign Up</button>
+            </div>
+        </div>
+
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+
+<script>
+    $(document).on('click', '#btnSignUp', function (e) {
+        e.preventDefault()
+        $.ajax({
+            type: 'POST',
+            url: '{% url "signup" %}',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                username: $('#ipt_username').val(),
+                password1: $('#ipt_password1').val(),
+                password2: $('#ipt_password2').val(),
+            },
+            success: function (data) {
+                if (!data.success) {
+                    message = `
+                    <div class="alert ` + data.message_class +  ` alert-dismissible fade show" role="alert">
+                        ` + data.message_text +  `
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    `
+                    $('#meessageDiv').html(message)
+                } else {
+                    window.location.href = data.redirect_url
+                }
+            }
+        })
+    })
+</script>
+
+{% endblock %}
